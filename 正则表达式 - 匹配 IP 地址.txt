@@ -1,0 +1,92 @@
+正则表达式 - 匹配 IP 地址
+
+
+IP地址格式
+IP地址的长度为32位(共有2^32个IP地址)，分为4段，每段8位
+用十进制数字表示，每段数字范围为0～255，段与段之间用句点隔开。
+// 0.0.0.0 ～ 255.255.255.255
+
+
+根据规则：每段相同，范围都在 0 ~ 255
+0~255 对应的正则表达式为 (2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2}
+
+下面简单介绍它的组成
+2(5[0-5]|[0-4]\d) 匹配：200 ~ 255
+[0-1]?\d{1,2} 匹配：0 ~ 199
+
+
+0 到 255 的式子已经写出来了，那么一共四段再加上中间的点就很容易了
+后边“点”和“数字”重复三次就可以了
+(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}
+屏幕快照 2019-06-30 下午2.13.37.png
+提取一段内容中的所有IP地址
+((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}
+判断字符串是否是IP地址
+^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$
+
+
+下边是各种语言的程序代码：(使用“在线工具[2]”生成)
+js
+var pattern = /((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}/g,
+    str = '';
+console.log(pattern.test(str));
+php
+$str = '';
+$isMatched = preg_match_all('/((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}/', $str, $matches);
+var_dump($isMatched, $matches);
+go
+package main
+
+import (
+    "fmt"
+    "regexp"
+)
+
+func main() {
+    str := "test"
+    matched, err := regexp.MatchString("((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}", str)
+    fmt.Println(matched, err)
+}
+rb
+pattern = /((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}/
+str = ''
+p pattern.match(str)
+python2
+import re
+pattern = re.compile(ur'((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}')
+str = u''
+print pattern.search(str)
+python3
+import re
+pattern = re.compile(r'((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}')
+str = ''
+print(pattern.search(str))
+java
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class RegexMatches {
+    
+    public static void main(String args[]) {
+        String str = "";
+        String pattern = "((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}";
+
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(str);
+        System.out.println(m.matches());
+    }
+
+}
+objc
+NSString *str = @"";
+NSString *pattern = @"((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}";
+NSError *error = NULL;
+NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: pattern options: nil error: &error];
+NSArray *match = [regex matchesInString: str options: NSMatchingCompleted range: NSMakeRange(0, [str length])];
+if (match.count != 0) {
+    // ...
+}
+
+
+经过大量数据测试，均可完美匹配，例如：001.001.001.001 依然是OK的，如有问题敬请指出，会第一时间回复
+请尊重原创，转载注明出处
